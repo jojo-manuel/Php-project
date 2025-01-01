@@ -1,0 +1,79 @@
+{
+  "script_name": "create_post.php",
+  "description": "A script for creating posts in a blog system with session handling and database insertion using prepared statements.",
+  "steps": [
+    {
+      "step": "Start session",
+      "action": "session_start()",
+      "description": "This starts the session to track the user's logged-in state."
+    },
+    {
+      "step": "Check if user is logged in",
+      "action": "if (!isset($_SESSION['user_id'])) { header('Location: login.php'); exit(); }",
+      "description": "If the user is not logged in, they are redirected to the login page."
+    },
+    {
+      "step": "Handle POST request",
+      "action": "if ($_SERVER['REQUEST_METHOD'] == 'POST') { ... }",
+      "description": "This block processes the form submission when a user submits a new post."
+    },
+    {
+      "step": "Sanitize user input",
+      "action": "$title = $_POST['title']; $content = $_POST['content']; $author_id = $_SESSION['user_id'];",
+      "description": "The form data (title and content) is retrieved and sanitized."
+    },
+    {
+      "step": "Prepare SQL statement",
+      "action": "$sql = 'INSERT INTO posts (title, content, author_id) VALUES (?, ?, ?)'; $stmt = $conn->prepare($sql);",
+      "description": "A prepared SQL statement is created to safely insert the data into the database."
+    },
+    {
+      "step": "Bind parameters",
+      "action": "$stmt->bind_param('ssi', $title, $content, $author_id);",
+      "description": "The title, content, and author ID are bound to the SQL statement as parameters."
+    },
+    {
+      "step": "Execute SQL query",
+      "action": "if ($stmt->execute()) { ... } else { ... }",
+      "description": "The SQL statement is executed. If successful, a success message is displayed; otherwise, an error message is shown."
+    },
+    {
+      "step": "Close statement",
+      "action": "$stmt->close();",
+      "description": "The prepared statement is closed to free resources."
+    },
+    {
+      "step": "Redirect user",
+      "action": "header('Location: index.php');",
+      "description": "After successful post creation, the user is redirected to the home page."
+    },
+    {
+      "step": "Error handling",
+      "action": "$_SESSION['error'] = 'Error: ' . $stmt->error;",
+      "description": "If there is an error while executing the SQL query, the error message is stored in the session and displayed to the user."
+    }
+  ],
+  "security_notes": [
+    {
+      "note": "SQL Injection Protection",
+      "description": "The use of prepared statements with parameter binding ensures the protection of the system against SQL injection attacks."
+    },
+    {
+      "note": "Session Management",
+      "description": "The script uses PHP sessions to track the user's logged-in state, and redirects to the login page if the user is not authenticated."
+    }
+  ],
+  "dependencies": {
+    "database": {
+      "servername": "localhost",
+      "username": "root",
+      "password": "",
+      "dbname": "personal_blog"
+    },
+    "session": "PHP session management"
+  },
+  "error_handling": {
+    "on_error": "Store error message in $_SESSION['error']",
+    "on_success": "Store success message in $_SESSION['message']"
+  }
+}
